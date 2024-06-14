@@ -1,17 +1,17 @@
-FROM --platform=linux/amd64 gradle:8.7-jdk21
+FROM gradle:8.7-jdk21 as build
+WORKDIR /app
+COPY --chown=gradle:gradle . /app
+RUN gradle clean build --no-daemon
 
-WORKDIR .
+FROM openjdk:21 as builder
+WORKDIR /app
+COPY --from=build /build/libs/typoreporter-0.0.1-SNAPSHOT.jar /app/typoreporter.jar
+RUN java -Djarmode=layertools -jar typoreporter.jar extract
 
-#
-# Build stage
-#
-
-COPY . .
-
-RUN gradle build -Dorg.gradle.debug=true --no-daemon
-
-#
-# Run application
-#
-
-CMD java -Xmx256m -jar build/libs/typoreporter-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
+FROM openjdk:21
+WORKDIR /app
+COPY --from=builder app/dependencies/ ./
+COPY --from=builder app/spring-boot-loader/ ./
+COPY --from=builder app/snapshot-dependencies/ ./
+COPY --from=builder app/application/ ./
+ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
