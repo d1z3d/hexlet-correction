@@ -35,7 +35,7 @@ class LoginIT {
     static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(POSTGRES_IMAGE)
         .withUsername("inmemory")
         .withPassword("inmemory")
-        .withDatabaseName("inmemory");
+        .withPrivilegedMode(true);
 
     @DynamicPropertySource
     static void datasourceProperties(DynamicPropertyRegistry registry) {

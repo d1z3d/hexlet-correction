@@ -43,7 +43,7 @@ public class TypoControllerIT {
     static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(POSTGRES_IMAGE)
         .withUsername("inmemory")
         .withPassword("inmemory")
-        .withDatabaseName("inmemory");
+        .withPrivilegedMode(true);
 
     @Autowired
     private TypoRepository typoRepository;

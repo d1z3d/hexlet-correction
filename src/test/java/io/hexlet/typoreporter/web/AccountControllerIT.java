@@ -35,7 +35,7 @@ public class AccountControllerIT {
     static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(POSTGRES_IMAGE)
         .withUsername("inmemory")
         .withPassword("inmemory")
-        .withDatabaseName("inmemory");
+        .withPrivilegedMode(true);
 
     @DynamicPropertySource
     static void dataSourceProperties(DynamicPropertyRegistry registry) {
