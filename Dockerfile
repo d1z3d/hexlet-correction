@@ -8,7 +8,7 @@ WORKDIR .
 
 COPY . .
 
-RUN gradle build -x test
+RUN gradle build
 
 #
 # Run application
