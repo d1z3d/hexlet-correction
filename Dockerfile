@@ -8,7 +8,7 @@ WORKDIR .
 
 COPY . .
 
-RUN gradle build
+RUN gradle build -Dorg.gradle.debug=true
 
 #
 # Run application
