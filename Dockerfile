@@ -1,7 +1,7 @@
 FROM gradle:8.7-jdk21 as build
 WORKDIR /app
 COPY --chown=gradle:gradle . /app
-RUN gradle clean build --no-daemon
+RUN gradle clean build -Dorg.gradle.debug=true --no-daemon
 
 FROM openjdk:21 as builder
 WORKDIR /app
