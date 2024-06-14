@@ -83,8 +83,9 @@ class WorkspaceControllerIT {
 
     @Container
     static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(POSTGRES_IMAGE)
+        .withUsername("inmemory")
         .withPassword("inmemory")
-        .withUsername("inmemory");
+        .withDatabaseName("inmemory");
 
     @Autowired
     private WorkspaceRepository repository;
