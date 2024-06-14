@@ -2,7 +2,7 @@ FROM docker:stable-dind
 RUN apk add --no-cache \
     python3 \
     py3-pip \
-    openjdk21-jdk \
+    openjdk21-jre \
     gradle
 WORKDIR /app
 COPY --chown=gradle:gradle . /app
