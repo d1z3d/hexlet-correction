@@ -1,7 +1,7 @@
 FROM gradle:8.7-jdk21 as build
-ARG TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
 WORKDIR /app
 COPY --chown=gradle:gradle . /app
+RUN ln -s /var/run/docker.sock:/var/run/docker.sock
 RUN gradle clean build --no-daemon
 
 FROM openjdk:21 as builder
