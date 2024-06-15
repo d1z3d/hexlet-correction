@@ -1,7 +1,6 @@
-FROM docker:dind
+FROM docker:dind-rootless
 RUN apk add --no-cache openjdk21
 RUN apk add --no-cache gradle
 WORKDIR /app
 COPY . /app
-RUN chmod 777 ./gradlew
-RUN ./gradlew clean build --stacktrace
+RUN gradle clean build --no-daemon --stacktrace
