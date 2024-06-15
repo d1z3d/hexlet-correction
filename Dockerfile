@@ -1,6 +1,19 @@
-FROM docker:dind
-RUN apk add --no-cache openjdk21
-RUN apk add --no-cache gradle
-WORKDIR /app
-COPY --chown=gradle:gradle . /app
-RUN gradle clean build --no-daemon
+FROM --platform=linux/amd64 gradle:8.7-jdk21
+
+WORKDIR .
+
+#
+# Build stage
+#
+
+COPY . .
+
+RUN gradle unitTest integrationTest
+
+RUN gradle build -x test
+
+#
+# Run application
+#
+
+CMD java -Xmx256m -jar build/libs/typoreporter-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod

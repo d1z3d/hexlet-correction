@@ -16,8 +16,7 @@ class TypoReporterApplicationIT {
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(Constraints.POSTGRES_IMAGE)
         .withUsername("inmemory")
-        .withPassword("inmemory")
-        .withPrivilegedMode(true);
+        .withPassword("inmemory");
 
     @DynamicPropertySource
     static void datasourceProperties(DynamicPropertyRegistry registry) {

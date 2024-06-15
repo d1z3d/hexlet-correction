@@ -65,8 +65,7 @@ public class WorkspaceSettingsControllerIT {
     @Container
     static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(POSTGRES_IMAGE)
         .withUsername("inmemory")
-        .withPassword("inmemory")
-        .withPrivilegedMode(true);
+        .withPassword("inmemory");
 
     @DynamicPropertySource
     static void datasourceProperties(DynamicPropertyRegistry registry) {
