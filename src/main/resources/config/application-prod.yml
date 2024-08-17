@@ -41,3 +41,10 @@ server:
     min-response-size: 1024
   error:
     include-stacktrace: never
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId: ${GITHUB_CLIENT_ID}
+            clientSecret: ${GITHUB_CLIENT_SECRET}

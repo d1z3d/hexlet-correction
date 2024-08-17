@@ -3,11 +3,13 @@ package io.hexlet.typoreporter.config;
 import io.hexlet.typoreporter.handler.exception.ForbiddenDomainException;
 import io.hexlet.typoreporter.handler.exception.WorkspaceNotFoundException;
 import io.hexlet.typoreporter.security.service.AccountDetailService;
+import io.hexlet.typoreporter.security.service.OAuth2UserService;
 import io.hexlet.typoreporter.security.service.SecuredWorkspaceService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,11 +22,14 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -86,6 +91,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authz -> authz
                 .requestMatchers(GET, "/webjars/**", "/widget/**", "/fragments/**", "/img/**").permitAll()
                 .requestMatchers("/", "/login", "/signup", "/error", "/about").permitAll()
+                .requestMatchers("/oauth/**").permitAll()
+                .requestMatchers("/login/oauth/code/github").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(login -> login
@@ -93,6 +100,11 @@ public class SecurityConfig {
                 .usernameParameter("email")
                 .defaultSuccessUrl("/workspaces")
                 .permitAll()
+            )
+            .oauth2Login(config -> config
+                    .loginPage("/login")
+                    .defaultSuccessUrl("/workspaces")
+                    .failureUrl("/login")
             )
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers(
@@ -106,6 +118,12 @@ public class SecurityConfig {
 
         http.headers().frameOptions().disable();
         return http.build();
+    }
+
+    @Bean
+    @RequestScope
+    public RestTemplate getRestTemplate() {
+        return new RestTemplate();
     }
 
     @Bean
@@ -136,7 +154,7 @@ public class SecurityConfig {
                     super.doFilterInternal(request, response, filterChain);
                 } catch (ForbiddenDomainException e) {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
-                }  catch (WorkspaceNotFoundException e) {
+                } catch (WorkspaceNotFoundException e) {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
                 }
             }

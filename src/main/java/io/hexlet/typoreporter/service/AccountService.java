@@ -2,6 +2,7 @@ package io.hexlet.typoreporter.service;
 
 import io.hexlet.typoreporter.domain.account.Account;
 import io.hexlet.typoreporter.domain.account.AuthProvider;
+import io.hexlet.typoreporter.domain.account.CustomOAuth2User;
 import io.hexlet.typoreporter.repository.AccountRepository;
 import io.hexlet.typoreporter.repository.WorkspaceRoleRepository;
 import io.hexlet.typoreporter.service.account.EmailAlreadyExistException;
@@ -20,6 +21,7 @@ import io.hexlet.typoreporter.handler.exception.AccountNotFoundException;
 import io.hexlet.typoreporter.handler.exception.NewPasswordTheSameException;
 import io.hexlet.typoreporter.handler.exception.OldPasswordWrongException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -137,5 +139,17 @@ public class AccountService implements SignupAccountUseCase, QueryAccount {
         sourceAccount.setPassword(newPassword);
         accountRepository.save(sourceAccount);
         return sourceAccount;
+    }
+
+    @Transactional
+    public void processOAuthPostLogin(CustomOAuth2User user) {
+        var existUser = accountRepository.existsByEmail(user.getEmail());
+        if (!existUser) {
+            SignupAccount signupAccount = new SignupAccount(
+                user.getLogin(), user.getEmail(), passwordEncoder.encode(user.getPassword()), user.getFirstName(), user.getLastName());
+            Account account = accountMapper.toAccount(signupAccount);
+            account.setAuthProvider(AuthProvider.GITHUB);
+            accountRepository.save(account);
+        }
     }
 }
